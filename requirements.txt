@@ -1,0 +1,4 @@
+Pillow==2.2.1
+bcrypt
+argon2
+Django==3.2
