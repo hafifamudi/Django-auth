@@ -1,5 +1,7 @@
 from django import forms
 from .models import UserProfileInfo
+
+
 class UserProfileInfoForm(forms.ModelForm):
     username = forms.CharField(widget=forms.TextInput(attrs={
         'class':'form-control',
@@ -44,3 +46,16 @@ class UserProfileInfoForm(forms.ModelForm):
     class Meta:
         model = UserProfileInfo
         fields = ('username','password','password_validation')
+
+    
+class LoginForm(forms.Form):
+    username = forms.CharField(max_length=45, label='Username',widget=forms.TextInput(attrs={
+        'class':'form-control',
+        'type':'text',
+        'placeholder':'Username'
+    }))
+    password = forms.CharField(max_length=45, label='Password', widget=forms.TextInput(attrs={
+        'class':'form-control',
+        'type':'password',
+        'placeholder':'Password'
+    }))

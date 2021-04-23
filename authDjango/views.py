@@ -4,8 +4,9 @@ from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate,login,logout
 
-from .forms import UserProfileInfoForm
+from .forms import UserProfileInfoForm, LoginForm
 from .models import UserProfileInfo
 
 class IndexView(View):
@@ -70,3 +71,50 @@ class RegisterUserView(View):
             return HttpResponseRedirect(reverse('authDjango:register'))
     
         return HttpResponseRedirect(reverse('authDjango:register'))
+
+class LoginUserView(View):
+    
+    def post(self, request):
+        login_form = LoginForm(request.POST)
+
+        if login_form.is_valid():
+            username = login_form.cleaned_data['username']
+            password = login_form.cleaned_data['password']
+
+            user_login = authenticate(username=username,password=password)
+
+            if user_login:
+                if user_login.is_active:
+                    login(request,user_login)
+                    messages.success(request,'Login Succesfully')
+                    return HttpResponseRedirect(reverse('userShop:index'))
+                else:
+                    messages.error(request,'The current user is not active')
+                    return HttpResponseRedirect(reverse('authDjango:index'))
+
+            else:
+                messages.error(request,'Wrong username or password combination')
+                return HttpResponseRedirect(reverse('authDjango:index'))
+         
+        messages.error(request,'Please input username and password')
+        return HttpResponseRedirect(reverse('authDjango:login'))
+        
+
+class LoginView(View):
+    template_name = 'authDjango/login.html'
+
+    def get(self,request):
+        # create form instance of form
+        login_form = LoginForm()
+
+        return render(request, self.template_name, {
+            'login_form':login_form
+        })
+
+
+class LogoutView(View):
+    def get(self,request):
+        logout(request)
+        messages.success(request,'Logout Succesfully')
+        return HttpResponseRedirect(reverse('authDjango:login'))
+        
